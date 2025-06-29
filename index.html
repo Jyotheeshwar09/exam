@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Access Portal</title>
+  <title>Secure Exam Access</title>
   <style>
     body {
       background-color: #111;
@@ -15,68 +15,125 @@
       height: 100vh;
       margin: 0;
     }
-    .password-box {
-      background: #1a1a1a;
-      padding: 2rem 3rem;
-      border-radius: 12px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+
+    .container {
       text-align: center;
+      padding: 2rem;
+      background: #1a1a1a;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      animation: fadeIn 1s ease-out;
     }
-    .password-box h2 {
-      margin-bottom: 1rem;
+
+    h2 {
+      margin-bottom: 2rem;
       font-weight: 600;
+      font-size: 1.6rem;
     }
-    .password-box input {
-      padding: 0.75rem;
-      font-size: 1rem;
-      width: 100%;
-      max-width: 300px;
+
+    .inputs {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .inputs input {
+      width: 50px;
+      height: 60px;
+      text-align: center;
+      font-size: 1.5rem;
       border: 2px solid #3498db;
-      border-radius: 6px;
       background: #222;
-      color: #f1f1f1;
+      color: #fff;
+      border-radius: 8px;
       outline: none;
-      margin-bottom: 1rem;
+      transition: transform 0.2s ease, border-color 0.3s ease;
     }
-    .password-box button {
-      padding: 0.5rem 1.2rem;
+
+    .inputs input:focus {
+      border-color: #2ecc71;
+      transform: scale(1.1);
+    }
+
+    button {
+      margin-top: 2rem;
+      padding: 0.7rem 2rem;
       font-size: 1rem;
       background: #2ecc71;
       border: none;
       color: white;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
-      transition: background 0.3s;
+      transition: background 0.3s ease;
     }
-    .password-box button:hover {
+
+    button:hover {
       background: #27ae60;
     }
+
     .error {
       color: #e74c3c;
       font-size: 0.9rem;
-      margin-top: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(-20px); }
+      100% { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
-  <div class="password-box">
-    <h2>Enter Password</h2>
-    <input type="password" id="passwordInput" placeholder="Enter Password" />
-    <br>
-    <button onclick="checkPassword()">Unlock</button>
-    <div id="errorMessage" class="error"></div>
+  <div class="container">
+    <h2>Enter 5-Digit Access Code</h2>
+    <div class="inputs">
+      <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" />
+      <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" />
+      <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" />
+      <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" />
+      <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" />
+    </div>
+    <button onclick="submitCode()">Unlock</button>
+    <div class="error" id="errorMessage"></div>
   </div>
 
   <script>
-    function checkPassword() {
-      const password = document.getElementById('passwordInput').value;
-      const correctPassword = "69420";
-      if (password === correctPassword) {
+    const inputs = document.querySelectorAll('.inputs input');
+    const correctPassword = '69420';
+
+    inputs[0].focus();
+
+    inputs.forEach((input, idx) => {
+      input.addEventListener('input', () => {
+        if (input.value.length === 1 && idx < inputs.length - 1) {
+          inputs[idx + 1].focus();
+        }
+      });
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && input.value === '' && idx > 0) {
+          inputs[idx - 1].focus();
+        }
+      });
+    });
+
+    function submitCode() {
+      const code = Array.from(inputs).map(input => input.value).join('');
+      if (code === correctPassword) {
         window.location.href = "https://jyotheeshwar09.github.io/exam/main.html";
       } else {
-        document.getElementById('errorMessage').textContent = "Incorrect password. Try again.";
+        document.getElementById('errorMessage').textContent = "Incorrect code. Try again.";
+        inputs.forEach(input => input.value = '');
+        inputs[0].focus();
       }
     }
+
+    // Allow Enter key to trigger submission
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        submitCode();
+      }
+    });
   </script>
 </body>
 </html>
